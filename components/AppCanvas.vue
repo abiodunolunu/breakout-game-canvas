@@ -1,8 +1,15 @@
 <script setup lang="ts">
-import { drawRectsOnCanvas, isTwoRectanglesColliding } from "~/helpers/functions";
-import { Ball, Paddle, Rectangle } from '~/types';
-
+import { drawRectsOnCanvas, getRandomNumber, isTwoRectanglesColliding } from "~/helpers/functions";
+import { Ball, Circle, Paddle, Rectangle } from '~/types';
+const canvasRef = ref<HTMLCanvasElement>();
+const ctx = ref<CanvasRenderingContext2D>()
+const paddle = ref<Paddle>()
+const ball = ref<Ball>()
+const bricks = ref<Rectangle[]>([])
+const openSettingsModal = ref(true)
 const gameOver = ref(false)
+let circles: Circle[] = []
+let animationRequestID: number;
 
 const settings = reactive({
     rows: 5,
@@ -30,13 +37,18 @@ function handleBallAndPaddle(paddle: Paddle, ball: Ball) {
     }
 }
 
-let animationRequestID: number;
-
-const canvasRef = ref<HTMLCanvasElement>();
-const ctx = ref<CanvasRenderingContext2D>()
-const paddle = ref<Paddle>()
-const ball = ref<Ball>()
-const bricks = ref<Rectangle[]>([])
+function createExplosion(brick: Rectangle) {
+    const ctx = brick.ctx
+    for (let i = 0; i < 30; i++) {
+        const x = getRandomNumber(brick.x, brick.x + brick.width)
+        const y = getRandomNumber(brick.y, brick.y + brick.height)
+        const color = brick.color
+        const velX = getRandomNumber(-2, 2)
+        const velY = getRandomNumber(-2, 2)
+        const circle = new Circle(ctx, x, y, 1.5, color, velX, velY)
+        circles.push(circle)
+    }
+}
 
 function resizeCanvas() {
     if (!ctx.value) return
@@ -69,6 +81,7 @@ function startAnimation(ctx: CanvasRenderingContext2D) {
             brick.draw()
             if (isBrickCollidingWithBall(brick, ball.value)) {
                 ball.value.velocityY = -ball.value.velocityY
+                createExplosion(brick)
                 bricks.value.splice(i, 1)
                 i--
             }
@@ -78,22 +91,24 @@ function startAnimation(ctx: CanvasRenderingContext2D) {
 
 
 
-        animationRequestID = requestAnimationFrame(animate);
+        circles = circles.filter(circle => {
+            circle.update()
+            return circle.isAlive
+        })
 
+        animationRequestID = requestAnimationFrame(animate);
         if (ball.value.y + ball.value.height >= canvas.height) {
             gameOver.value = true
             stopAnimating()
         }
-
     }
-
     animate()
 }
 
 function init(ctx: CanvasRenderingContext2D) {
     const canvas = ctx.canvas
     bricks.value = drawRectsOnCanvas(ctx, settings.rows, settings.columns, 10, 40)
-    paddle.value = new Paddle(ctx, (canvas.width / 2) - 100, canvas.height - 20, 20, 200, '#00FF00', settings.paddleSpeed)
+    paddle.value = new Paddle(ctx, (canvas.width / 2) - 100, canvas.height - 20, 10, 200, '#00FF00', settings.paddleSpeed)
     ball.value = new Ball(ctx, paddle.value.center, canvas.height - 80, 10, 10, '#00FFFF', 0, settings.ballSpeed)
 
     if (settings.enableKeyBoard) {
@@ -110,7 +125,6 @@ function init(ctx: CanvasRenderingContext2D) {
 }
 
 
-const gameRunning = ref(false)
 
 
 
@@ -120,20 +134,11 @@ onMounted(() => {
 
     resizeCanvas();
     window.addEventListener("resize", resizeCanvas);
-
-    // init(ctx.value)
-
-
-
-
-    // startAnimation(ctx.value)
 });
 
 function stopAnimating() {
-    console.log('here')
     cancelAnimationFrame(animationRequestID)
 }
-
 
 onUnmounted(() => {
     window.removeEventListener("resize", resizeCanvas);
@@ -141,14 +146,12 @@ onUnmounted(() => {
 
 
 
-const rc = ref(!true)
 function handleSubmit() {
     if (!ctx.value) return
     openSettingsModal.value = false
     gameOver.value = false
     init(ctx.value)
 }
-const openSettingsModal = ref(true)
 
 watch(gameOver, newVal => {
     if (newVal) {

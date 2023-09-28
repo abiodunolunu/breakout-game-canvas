@@ -1,4 +1,5 @@
 import { Rectangle } from "~/types/Rectangle"
+const bricksColors = ['#FF0000', '#FFA500', '#FFFF00']
 
 export function isTwoRectanglesColliding(x1: number, x2: number, y1: number, y2: number, w1: number, w2: number, h1: number, h2: number): boolean {
 
@@ -19,14 +20,10 @@ export function isTwoRectanglesColliding(x1: number, x2: number, y1: number, y2:
     return isHorizontallyOverlapping && isVerticallyOverlapping
 }
 
-
-const bricksColors = ['#FF0000', '#FFA500', '#FFFF00']
-
-function getRandomColor() {
+export function getRandomColor() {
     const randomIndex = Math.floor(Math.random() * bricksColors.length);
     return bricksColors[randomIndex];
 }
-
 
 export function drawRectsOnCanvas(ctx: CanvasRenderingContext2D, rows: number, columns: number, spacing: number, height: number) {
     const result = []
@@ -48,4 +45,19 @@ export function drawRectsOnCanvas(ctx: CanvasRenderingContext2D, rows: number, c
         }
     }
     return result
+}
+
+export function getRandomNumber(min: number, max: number): number {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+export function hexToRgb(hex: string): [number, number, number] {
+    hex = hex.replace(/^#/, '');
+
+    let bigint = parseInt(hex, 16);
+    let r = (bigint >> 16) & 255;
+    let g = (bigint >> 8) & 255;
+    let b = bigint & 255;
+
+    return [r, g, b];
 }
