@@ -1,7 +1,7 @@
 import { Rectangle } from "~/types/Rectangle"
 const bricksColors = ['#FF0000', '#FFA500', '#FFFF00']
 
-export function isTwoRectanglesColliding(x1: number, x2: number, y1: number, y2: number, w1: number, w2: number, h1: number, h2: number): boolean {
+export function areRectanglesOverlapping(x1: number, x2: number, y1: number, y2: number, w1: number, w2: number, h1: number, h2: number): boolean {
 
     const rect1Left = Math.min(x1, x1 + w1)
     const rect1Right = Math.max(x1, x1 + w1)

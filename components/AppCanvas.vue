@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { drawRectsOnCanvas, getRandomNumber, isTwoRectanglesColliding } from "~/helpers/functions";
+import { areRectanglesOverlapping, drawRectsOnCanvas, getRandomNumber } from "~/helpers/functions";
 import { Ball, Circle, Paddle, Rectangle } from '~/types';
 const canvasRef = ref<HTMLCanvasElement>();
 const ctx = ref<CanvasRenderingContext2D>()
@@ -22,11 +22,11 @@ const settings = reactive({
 })
 
 function isBrickCollidingWithBall(brick: Rectangle, ball: Ball) {
-    return isTwoRectanglesColliding(brick.x, ball.x, brick.y, ball.y, brick.width, ball.width, brick.height, ball.height)
+    return areRectanglesOverlapping(brick.x, ball.x, brick.y, ball.y, brick.width, ball.width, brick.height, ball.height)
 }
 
 function handleBallAndPaddle(paddle: Paddle, ball: Ball) {
-    if (isTwoRectanglesColliding(paddle.x, ball.x, paddle.y, ball.y, paddle.width, ball.width, paddle.height, ball.height)) {
+    if (areRectanglesOverlapping(paddle.x, ball.x, paddle.y, ball.y, paddle.width, ball.width, paddle.height, ball.height)) {
 
         const collisionPoint = ball.center - paddle.center
         const normalizedCollisionPoint = collisionPoint / (paddle.width / 2)
@@ -160,7 +160,7 @@ watch(gameOver, newVal => {
 <template>
     <div class="wrapper">
         <canvas ref="canvasRef"> </canvas>
-        <Modal v-model="openSettingsModal">
+        <Modal v-model="openSettingsModal" :can-close="false">
             <form @submit.prevent="handleSubmit">
                 <div class="form-item full" style="text-align: center; font-size: 2rem;" v-if="gameOver">GAME OVER! TRY
                     AGAIN</div>
@@ -218,7 +218,7 @@ div.wrapper {
 
 form {
     background-color: white;
-    padding: 1rem 2rem;
+    padding: 1rem;
     border-radius: 0.5rem;
 
     display: grid;
@@ -234,7 +234,7 @@ form {
         }
 
         label {
-            font-size: 14px;
+            font-size: 12px;
             margin-bottom: 0.25rem;
             color: #111827;
             font-weight: 500;
