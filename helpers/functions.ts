@@ -31,11 +31,23 @@ export function drawRectsOnCanvas(ctx: CanvasRenderingContext2D, rows: number, c
     const totalSpaceNeeded = (columns + 1) * spacing
     const availableWidth = canvas.width - totalSpaceNeeded
     const widthOfEachRect = availableWidth / columns
+    let colorIndex = 0
+
     for (let row = 0; row < rows; row++) {
         const y = row * (spacing + height)
         let startX = spacing
         for (let col = 0; col < columns; col++) {
-            const rect = new Rectangle(ctx, startX, y, height, widthOfEachRect, getRandomColor())
+
+            if (col % 4 === 0) {
+                colorIndex = 0;  // #FF0000
+            } else if (col % 4 === 1 || col % 4 === 3) {
+                colorIndex = 1;  // #FFA500
+            } else if (col % 4 === 2) {
+                colorIndex = 2;  // #FFFF00
+            }
+
+
+            const rect = new Rectangle(ctx, startX, y, height, widthOfEachRect, bricksColors[colorIndex])
 
             const endOfCurrentRect = startX + widthOfEachRect
 
