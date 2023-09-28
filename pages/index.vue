@@ -1,7 +1,7 @@
 <script setup lang='ts'>
-
-interface Props { }
-const props = defineProps<Props>();
+useHead({
+    title: 'Breakout Game'
+})
 </script>
 
 <template>

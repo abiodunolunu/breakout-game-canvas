@@ -16,8 +16,8 @@ const settings = reactive({
     columns: 10,
     ballSpeed: 5,
     enableKeyBoard: false,
-    enableMouse: false,
-    enableTouch: false,
+    enableMouse: true,
+    enableTouch: true,
     paddleSpeed: 5
 })
 
@@ -124,12 +124,9 @@ function init(ctx: CanvasRenderingContext2D) {
     startAnimation(ctx)
 }
 
-
-
-
-
 onMounted(() => {
-    const canvas = canvasRef.value!;
+    const canvas = canvasRef.value;
+    if (!canvas) throw Error('NO CANVAS ELEMENT FOUND!')
     ctx.value = canvas.getContext("2d")!;
 
     resizeCanvas();
