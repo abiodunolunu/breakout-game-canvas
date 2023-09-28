@@ -60,6 +60,7 @@ function closeModal() {
         border-radius: 0.5rem;
         background-color: white;
         padding: 1rem;
+        margin: 1rem;
 
         transition: all 500ms;
 
